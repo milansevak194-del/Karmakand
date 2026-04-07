@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karmakand.com</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- 🌐 LANGUAGE POPUP -->
+
+<div id="langPopup" class="popup">
+    <h2>Select Language</h2>
+    <button onclick="setLang('en')">English</button>
+    <button onclick="setLang('gu')">ગુજરાતી</button>
+    <button onclick="setLang('hi')">हिन्दी</button>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="logo"><img src="{{ url_for('static', filename='logo.png') }}" class="nav-logo">
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <h1 id="title">Welcome to Karmakand<span class="dotcom">.com</span></h1>
+    <p id="subtitle">Smart Vedic Platform powered by Karma AI</p>
+</section>
+
+<!-- SERVICES -->
+<section class="services">
+
+    <!-- CARD 1 -->
+    <div class="card" onclick="goBrahmin()">
+        <h3 id="card1">🧘 Brahmin Services</h3>
+        <p id="card1p">Join as verified Brahmin</p>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="card" onclick="openAI()">
+        <h3 id="card2">🤖 Karma AI</h3>
+        <p id="card2p">Ask astrology & rituals</p>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="card" onclick="goYajman()">
+        <h3 id="card3">📿 Book Pooja</h3>
+        <p id="card3p">Book rituals easily</p>
+    </div>
+
+</section>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

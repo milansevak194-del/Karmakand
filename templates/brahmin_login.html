@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brahmin Verification</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<section class="form-container big">
+
+<h2 id="formTitle">Brahmin Verification</h2>
+
+<h2>{{ result }}</h2>
+
+<form action="/brahmin_verify" method="POST"
+enctype="multipart/form-data"
+ onsubmit="return validateBrahminForm()">
+
+<!-- PERSONAL -->
+<input type="text" name="name" placeholder="Full Name" required>
+<input type="text" name="mobile" placeholder="Mobile Number" required>
+
+<!-- EDUCATION -->
+<input type="text" name="pathshala" placeholder="Pathshala Name" required>
+<input type="text" name="veda" placeholder="Veda (e.g. Shukla Yajurveda)" required>
+<input type="text" name="shakha" placeholder="Shakha" required>
+
+<!-- DOCUMENTS -->
+<label>10th Marksheet</label>
+<input type="file" name="marksheet10" required>
+
+<label>12th Marksheet</label>
+<input type="file" name="marksheet12" required>
+
+<label>College Certificate</label>
+<input type="file" name="certificate" required>
+
+<label>Aadhar Card</label>
+<input type="file" name="aadhar" required>
+
+<label>PAN Card</label>
+<input type="file" name="pan" required>
+
+<label>Live Photo</label>
+<input type="file" name="photo" required>
+
+<button type="submit">Submit for Verification</button>
+
+</form>
+</form>
+
+</section>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

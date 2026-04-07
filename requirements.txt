@@ -1,0 +1,6 @@
+Flask
+mysql-connector-python
+Werkzeug
+razorpay
+gunicorn
+python-dotenv

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brahmin Dashboard</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav>
+    <h2>Brahmin Dashboard 🕉️</h2>
+</nav>
+
+<section class="dashboard">
+
+    <h1>Welcome, <span id="bname">{{ name }}</span></h1>
+
+<!-- ADD THIS BELOW -->
+
+    <h2 id="bname">{{ name }}</h2>
+
+    <p id="wallet">Wallet: Loading...</p>
+    <p id="rating">Rating: Loading...</p>
+    <p id="team">Team: Loading...</p>
+    <p id="status">Status: Loading...</p>
+
+    <div class="cards">
+
+        <!-- WALLET -->
+        <div class="card">
+            <h3>💰 Wallet</h3>
+            <p id="wallet">₹0</p>
+        </div>
+
+        <!-- RATING -->
+        <div class="card">
+            <h3>⭐ Rating</h3>
+            <p id="rating">0 / 5</p>
+        </div>
+
+        <!-- TEAM -->
+        <div class="card">
+            <h3>👥 Team</h3>
+            <p id="team">0 Members</p>
+        </div>
+
+        <div class="card">
+            <h3>New Booking</h3>
+            <p id="bookingInfo">No bookings yet</p>
+        </div>
+
+    </div>
+
+</section>
+
+<script src="{{ url_for('static', 
+filename='script.js') }}"></script>
+
+<script>
+    loadBrahminFromDB("{{ name }}");
+</script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yajman Panel</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="form-container" id="loginBox">
+
+    <h2>Yajman Login</h2>
+
+    <input type="text" id="mobile" placeholder="Enter Mobile Number">
+    <button onclick="sendOTP()">Send OTP</button>
+
+    <div id="otpBox" style="display:none;">
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify</button>
+    </div>
+
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="yajmanDashboard" style="display:none;">
+
+    <h2>Welcome <span id="yname">User</span></h2>
+
+    <!-- SEARCH -->
+    <input type="text" id="search" placeholder="Search Brahmin..." onkeyup="searchBrahmin()">
+
+    <!-- LIST -->
+    <div id="brahminList">
+
+        <div class="card">
+            <h3>Pandit Ramesh</h3>
+            <p>⭐ 4.8</p>
+            <button onclick="rateBrahmin('Pandit Ramesh')">Rate</button>
+        </div>
+
+        <div class="card">
+            <h3>Pandit Suresh</h3>
+            <p>⭐ 4.5</p>
+            <button onclick="rateBrahmin('Pandit Suresh')">Rate</button>
+        </div>
+
+    </div>
+
+    <button onclick="openBooking('Pandit Ramesh')">Book Pooja</button>
+
+    <!-- BOOKING FORM -->
+
+    <form id="bookingForm" action="/book_pooja" method="POST" style="display:none;" class="form-container">
+
+         <h3>Book Pooja</h3>
+
+         <input type="text" name="name" placeholder="Your Name" required>
+
+         <input type="text" id="bname" name="brahmin" readonly>
+
+         <input type="date" id="bdate" name="date">
+ 
+         <input type="text" id="blocation" name="location" placeholder="Enter Location">
+
+         <button type="submit">Confirm Booking
+         </button>
+ 
+</form>
+  
+  <button onclick="goToPayment()">Pay Now 💰</button>
+ 
+<!-- ⭐ RATING FORM -->
+<h3>Rate Brahmin</h3>
+
+<form action="/submit_rating" method="POST">
+
+<input type="text" name="brahmin" placeholder="Brahmin Name" required>
+
+<select name="rating" required>
+    <option value="">Select Rating</option>
+    <option value="1">1 ⭐</option>
+    <option value="2">2 ⭐</option>
+    <option value="3">3 ⭐</option>
+    <option value="4">4 ⭐</option>
+    <option value="5">5 ⭐</option>
+</select>
+<button type="submit">Submit Rating
+</button>
+
+</form>
+
+    <!-- KARMA AI -->
+    <div class="card" onclick="openAI()">
+        <h3>🤖 Karma AI</h3>
+        <p>Ask anything</p>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
