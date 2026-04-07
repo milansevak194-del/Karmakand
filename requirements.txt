@@ -2,5 +2,5 @@ Flask
 mysql-connector-python
 Werkzeug
 razorpay
-gunicorn==21.0.0
+gunicorn
 python-dotenv
