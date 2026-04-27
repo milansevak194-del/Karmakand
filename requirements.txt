@@ -1,6 +1,6 @@
-Flask==2.3.3
-Werkzeug==2.3.7
-gunicorn==21.2.0
-mysql-connector-python==8.0.33
-python-dotenv==1.0.1
-razorpay==1.3.0
+Flask
+Werkzeug
+waitress
+mysql-connector-python
+python-dotenv
+razorpay
