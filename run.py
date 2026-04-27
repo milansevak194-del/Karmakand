@@ -54,6 +54,7 @@ def brahmin():
 # =========================
 @app.route("/brahmin_verify", methods=["POST"])
 def brahmin_verify():
+    
     name = request.form.get("name")
     mobile = request.form.get("mobile")
     file = request.files.get("marksheet10")
