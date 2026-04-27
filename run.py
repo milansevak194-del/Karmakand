@@ -1,14 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from werkzeug.utils import secure_filename
-from Karma import KarmaAI
 import os
 import mysql.connector
 
 app = Flask(__name__)
 
-# =========================
-# 🔥 DATABASE CONNECTION
-# =========================
+# ==============================
+# 🔹 DATABASE CONNECTION
+# ==============================
 try:
     db = mysql.connector.connect(
         host=os.getenv("DB_HOST"),
@@ -18,78 +16,85 @@ try:
     )
     cursor = db.cursor(dictionary=True)
     print("✅ DB Connected")
+
 except Exception as e:
     print("❌ DB Error:", e)
 
-# =========================
-# 📁 UPLOAD FOLDER
-# =========================
-UPLOAD_FOLDER = "uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+# ==============================
+# 🔹 CREATE TABLES (AUTO)
+# ==============================
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    mobile VARCHAR(20),
+    pooja VARCHAR(100),
+    date VARCHAR(50)
+)
+""")
 
-# =========================
-# 🤖 AI INIT
-# =========================
-ai = KarmaAI()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS brahmins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    mobile VARCHAR(20)
+)
+""")
 
-# =========================
-# 🏠 HOME
-# =========================
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS yajmans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    mobile VARCHAR(20)
+)
+""")
+
+db.commit()
+
+
+# ==============================
+# 🔹 ROUTES
+# ==============================
+
+# HOME
 @app.route("/")
 def home():
     return render_template("home.html")
 
-# =========================
-# 👨‍🦳 BRAHMIN LOGIN
-# =========================
-@app.route("/brahmin")
-def brahmin():
-    return render_template("brahmin_login.html")
 
-# =========================
-# 🔐 VERIFY
-# =========================
-@app.route("/brahmin_verify", methods=["POST"])
-def brahmin_verify():
-    
-    name = request.form.get("name")
-    mobile = request.form.get("mobile")
-    file = request.files.get("marksheet10")
-
-    filename = ""
-    if file:
-        filename = secure_filename(file.filename)
-        path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(path)
-
-    # AI check
-    result = ai.process(name + " " + mobile)
-
-    if result:
-        return redirect(url_for("brahmin"))
-
-    return render_template("brahmin_login.html", result="Verification Failed ❌")
-
-# =========================
-# 🧍 YAJMAN PAGE
-# =========================
+# BOOKING PAGE
 @app.route("/yajman")
 def yajman():
     return render_template("yajman_booking.html")
 
-# =========================
-# 💰 PAYMENT PAGE
-# =========================
-@app.route("/payment")
-def payment():
-    return render_template("payment.html")
 
-# =========================
-# 🚀 RUN (FOR RAILWAY)
-# =========================
+# SAVE BOOKING
+@app.route("/book", methods=["POST"])
+def book():
+    name = request.form.get("name")
+    mobile = request.form.get("mobile")
+    pooja = request.form.get("pooja")
+    date = request.form.get("date")
+
+    query = "INSERT INTO bookings (name, mobile, pooja, date) VALUES (%s, %s, %s, %s)"
+    cursor.execute(query, (name, mobile, pooja, date))
+    db.commit()
+
+    return "✅ Booking Saved"
+
+
+# VIEW BOOKINGS (TEST)
+@app.route("/data")
+def data():
+    cursor.execute("SELECT * FROM bookings")
+    data = cursor.fetchall()
+    return jsonify(data)
+
+
+# ==============================
+# 🔹 RUN
+# ==============================
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)s
