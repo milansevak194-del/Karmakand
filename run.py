@@ -5,6 +5,15 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+# ✅ DB CONNECTION (અહીં લખવું)
+db = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+)
+cursor = db.cursor()
+
 # Upload folder
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
