@@ -51,7 +51,7 @@ try:
 
 except mysql.connector.Error as e:
     print("❌ DB Connection Error:", e)
-    print("💡 ટિપ: ચેક કરો કે XAMPP માં MySQL 'Start' છે કે નહીં?")
+    print("💡 Tip: Check if MySQL is 'Started' in XAMPP Control Panel.")
     db = None
     cursor = None
 
