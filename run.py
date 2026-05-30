@@ -5,52 +5,55 @@ import mysql.connector
 app = Flask(__name__)
 
 # ==============================
-# 🔹 DATABASE CONNECTION
+# 🔹 DATABASE CONNECTION 
 # ==============================
-try:
-    db = mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
+try: 
+    db = mysql.connector.connect(  
+        host='127.0.0.1',      
+        user='root',           
+        password='',           
+        database='karmakand'   
     )
     cursor = db.cursor(dictionary=True)
-    print("✅ DB Connected")
+    print("✅ DB Connected Successfully!")
 
-except Exception as e:
-    print("❌ DB Error:", e)
+    # ==============================
+    # 🔹 CREATE TABLES 
+    # ==============================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS bookings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        mobile VARCHAR(20),
+        pooja VARCHAR(100),
+        date VARCHAR(50)
+    )
+    """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS brahmins (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        mobile VARCHAR(20)
+    )
+    """)
 
-# ==============================
-# 🔹 CREATE TABLES (AUTO)
-# ==============================
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    mobile VARCHAR(20),
-    pooja VARCHAR(100),
-    date VARCHAR(50)
-)
-""")
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS yajmans (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        mobile VARCHAR(20)
+    )
+    """)
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS brahmins (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    mobile VARCHAR(20)
-)
-""")
+    db.commit()
+    print("✅ Tables Checked/Created!")
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS yajmans (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    mobile VARCHAR(20)
-)
-""")
-
-db.commit()
+except mysql.connector.Error as e:
+    print("❌ DB Connection Error:", e)
+    print("💡 ટિપ: ચેક કરો કે XAMPP માં MySQL 'Start' છે કે નહીં?")
+    db = None
+    cursor = None
 
 
 # ==============================
@@ -72,21 +75,29 @@ def yajman():
 # SAVE BOOKING
 @app.route("/book", methods=["POST"])
 def book():
+    if not db or not cursor:
+        return "❌ Database not connected!", 500
+        
     name = request.form.get("name")
     mobile = request.form.get("mobile")
     pooja = request.form.get("pooja")
     date = request.form.get("date")
 
-    query = "INSERT INTO bookings (name, mobile, pooja, date) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query, (name, mobile, pooja, date))
-    db.commit()
-
-    return "✅ Booking Saved"
+    try:
+        query = "INSERT INTO bookings (name, mobile, pooja, date) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (name, mobile, pooja, date))
+        db.commit()
+        return "✅ Booking Saved"
+    except Exception as e:
+        return f"❌ Error saving booking: {e}", 500
 
 
 # VIEW BOOKINGS (TEST)
 @app.route("/data")
 def data():
+    if not cursor:
+        return "❌ Database not connected!", 500
+        
     cursor.execute("SELECT * FROM bookings")
     data = cursor.fetchall()
     return jsonify(data)
@@ -96,5 +107,5 @@ def data():
 # 🔹 RUN
 # ==============================
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)s
+
+    app.run(host="0.0.0.0", port=5000, debug=True)
