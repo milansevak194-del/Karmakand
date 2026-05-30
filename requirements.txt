@@ -4,3 +4,4 @@ waitress
 mysql-connector-python
 python-dotenv
 razorpay
+gunicorn
