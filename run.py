@@ -1,32 +1,46 @@
 import os
 import mysql.connector
+from mysql.connector import pooling
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 app = Flask(__name__)
 
 # ==========================================
-# 🔹 DATABASE CONFIGURATION
+# 🔹 DATABASE CONFIGURATION & POOLING
 # ==========================================
-# Fetching database credentials from environment variables for production security.
-# Defaults to local XAMPP/MySQL environment configuration if not found.
 DB_HOST = os.environ.get('DB_HOST', '127.0.0.1')
 DB_USER = os.environ.get('DB_USER', 'root')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
-DB_NAME = os.environ.get('DB_NAME', 'karmakand')
+DB_NAME = os.environ.get('DB_NAME', 'test')  # Default TiDB database is 'test'
 DB_PORT = os.environ.get('DB_PORT', '3306')
 
-try: 
-    db = mysql.connector.connect(  
-        host=DB_HOST,      
-        user=DB_USER,           
-        password=DB_PASSWORD,           
-        database=DB_NAME,
-        port=int(DB_PORT)
-    )
-    cursor = db.cursor(dictionary=True)
-    print("✅ Database Connected Successfully!")
+# Configuration dictionary for MySQL connection
+db_config = {
+    "host": DB_HOST,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
+    "database": DB_NAME,
+    "port": int(DB_PORT)
+}
 
-    # 🔹 Creating the 'brahmins' table with all required fields if it does not exist
+# If deploying on Render and using TiDB Cloud, force SSL connection safely
+if 'DB_HOST' in os.environ and 'tidbcloud.com' in os.environ.get('DB_HOST', ''):
+    db_config["ssl_verify_cert"] = True
+    db_config["ssl_disabled"] = False
+
+# Create a connection pool to manage auto-reconnects and prevent 500 server errors
+try:
+    db_pool = mysql.connector.pooling.MySQLConnectionPool(
+        pool_name="karmakand_pool",
+        pool_size=5,
+        pool_reset_session=True,
+        **db_config
+    )
+    print("✅ Database Connection Pool Created Successfully!")
+    
+    # Initialize tables upon setup
+    db = db_pool.get_connection()
+    cursor = db.cursor(dictionary=True)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS brahmins (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,12 +58,18 @@ try:
     )
     """)
     db.commit()
+    cursor.close()
+    db.close()
     print("✅ Database Tables Verified and Synchronized Successfully!")
-
 except mysql.connector.Error as e:
-    print("❌ Database Connection Error:", e)
-    db = None
-    cursor = None
+    print("❌ Database Connection Error during initialization:", e)
+    db_pool = None
+
+# Helper function to safely fetch an active database connection from the pool
+def get_db_connection():
+    if db_pool:
+        return db_pool.get_connection()
+    return None
 
 
 # ==========================================
@@ -73,22 +93,19 @@ def yajman():
 # 📿 BRAHMIN REGISTRATION PAGE
 @app.route("/brahmin")
 def brahmin():
-    """
-    Renders the Brahmin Verification / Registration page.
-    Requires 'brahmin.html' to exist inside the templates directory.
-    """
+    """Renders the Brahmin Verification / Registration page."""
     return render_template("brahmin.html")
 
 
 # 🚀 BRAHMIN VERIFICATION SUBMISSION HANDLER
 @app.route("/brahmin_verify", methods=["POST"])
 def brahmin_verify():
-    """
-    Handles form submission for Brahmin professional verification.
-    Processes text inputs and uploaded multi-part document file names into the database.
-    """
-    if not db or not cursor:
+    """Handles form submission for Brahmin professional verification with dynamic connection handling."""
+    db = get_db_connection()
+    if not db:
         return "❌ Database connection is not active!", 500
+
+    cursor = db.cursor(dictionary=True)
 
     # Extracting text data from the verification form parameters
     name = request.form.get("name")
@@ -118,6 +135,10 @@ def brahmin_verify():
         return render_template("brahmin.html", result="✅ Verification Form Submitted Successfully!")
     except Exception as e:
         return f"❌ Error saving verification details: {e}", 500
+    finally:
+        # Safely close cursor and return connection back to the pool
+        cursor.close()
+        db.close()
 
 
 # ==========================================
