@@ -94,7 +94,7 @@ def yajman():
 @app.route("/brahmin")
 def brahmin():
     """Renders the Brahmin Verification / Registration page."""
-    return render_template("brahmin.html")
+    return render_template("brahmin_login.html")
 
 
 # 🚀 BRAHMIN VERIFICATION SUBMISSION HANDLER
